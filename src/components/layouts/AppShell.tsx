@@ -1,5 +1,5 @@
 import { Children } from "react";
-import Navbar from "./navbar";
+import Navbar from "../fragments/navbar";
 import { useRouter } from "next/router";
 
 type AppShellProps = {

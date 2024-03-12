@@ -1,6 +1,9 @@
-import { retrieveData } from "@/utils/firebase/service";
+import ProductCard from "@/components/fragments/productCard";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const ProductPage = () => {
   //Define data type
@@ -8,7 +11,8 @@ const ProductPage = () => {
     id: number;
     name: string;
     price: number;
-    size: string;
+    category: string;
+    image: string;
   };
 
   const [isLogin, setIsLogin] = useState(false);
@@ -21,20 +25,30 @@ const ProductPage = () => {
   //   }
   // }, [isLogin, push]);
 
+  //Menggunakan library SWR
+  const { data, error, isLoading } = useSWR("/api/product", fetcher);
+
   //Fetch API sendiri
-  useEffect(() => {
-    fetch("api/product")
-      .then((res) => res.json())
-      .then((response) => setProducts(response.data));
-  });
+  // useEffect(() => {
+  //   fetch("api/product")
+  //     .then((res) => res.json())
+  //     .then((response) => setProducts(response.data));
+  // }, [isLogin]); //Isi dari dependency array, adalah untuk ngambil data ketika dependency tersebut berubah isinya
 
   return (
     <>
       <div>Product Page</div>
       {/* Define kalo product itu producttype */}
-      {products.map((product: productType) => {
-        return <div key={product.id}>{product.name}</div>;
-      })}
+      <div className="flex">
+        {isLoading
+          ? []
+          : data.data?.map((product: productType) => {
+              return <ProductCard key={product.id} {...product} />;
+            })}
+        {products.map((product: productType) => {
+          return <ProductCard key={product.id} {...product} />;
+        })}
+      </div>
     </>
   );
 };
